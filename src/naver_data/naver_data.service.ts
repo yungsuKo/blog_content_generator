@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import * as puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BlogPost } from './entities/blogpost.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class NaverDataService {
+  constructor(
+    @InjectRepository(BlogPost)
+    private blogPostRepository: Repository<BlogPost>,
+  ) {}
+
   async getList({ pageNum }: { pageNum: number }): Promise<[string]> {
     const url = `https://kin.naver.com/best/listaha.naver?svc=KIN&dirId=7&page=${pageNum}`;
     const browser = await puppeteer.launch({
@@ -17,10 +24,15 @@ export class NaverDataService {
     const content = await page.content();
     const $ = cheerio.load(content);
     const lists = $('#au_board_list > tr');
+    const result = [];
     lists.map((idx, list) => {
       const $list = cheerio.load(list);
-      console.log($list('.title').text().trim());
+      const question = $list('.title').text().trim();
+      result.push({ question });
     });
+    console.log(result);
+    this.blogPostRepository.save(result);
+
     // 크롤러 성능 향상
     return ['aaa'];
   }
