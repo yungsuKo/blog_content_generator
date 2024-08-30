@@ -28,10 +28,17 @@ export class NaverDataService {
     lists.map((idx, list) => {
       const $list = cheerio.load(list);
       const question = $list('.title').text().trim();
-      result.push({ question });
+      const detail_url = $list('.title > a').attr('href');
+      result.push({ question, detail_url });
     });
+    await page.close();
+
     console.log(result);
-    this.blogPostRepository.save(result);
+    // this.blogPostRepository.save(result);
+    result.forEach(async (res) => {
+      const page = await browser.newPage();
+      await page.goto(`https://kin.naver.com${res.detail_url}`);
+    });
 
     // 크롤러 성능 향상
     return ['aaa'];
