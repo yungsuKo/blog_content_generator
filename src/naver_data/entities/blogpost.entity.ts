@@ -6,7 +6,10 @@ export class BlogPost {
   id: number;
 
   @Column()
-  question: string;
+  question_title: string;
+
+  @Column()
+  question_desc: string;
 
   @Column()
   detail_url: string;
@@ -18,8 +21,8 @@ export class BlogPost {
   answer: string;
 
   @Column({ default: '' })
-  title: string;
+  result_title: string;
 
   @Column({ default: '' })
-  description: string;
+  result_desc: string;
 }
