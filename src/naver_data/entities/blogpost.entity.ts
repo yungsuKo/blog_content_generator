@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class BlogPost {
@@ -15,14 +21,23 @@ export class BlogPost {
   detail_url: string;
 
   @Column()
-  status: number;
+  answers: string;
 
-  @Column({ default: '' })
-  answer: string;
+  @Column()
+  pageNum: number;
+
+  @Column({ default: 0 })
+  status: number;
 
   @Column({ default: '' })
   result_title: string;
 
   @Column({ default: '' })
   result_desc: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
