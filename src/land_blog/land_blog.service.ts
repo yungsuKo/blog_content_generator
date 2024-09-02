@@ -30,7 +30,7 @@ export class LandBlogService {
         await sleep(1000);
       } catch (e) {
         // 버튼이 더 이상 존재하지 않으면 while 루프를 종료
-        console.log('더 이상 버튼이 존재하지 않습니다.', e);
+        console.log('더 이상 버튼이 존재하지 않습니다.');
         break;
       }
     }
@@ -48,7 +48,9 @@ export class LandBlogService {
       const company = $list('div.sa_text_info_left > div.sa_text_press')
         .text()
         .trim();
-      const time = $list('div.sa_text_info_left > div.sa_text_datetime');
+      const time = $list('div.sa_text_info_left > div.sa_text_datetime')
+        .text()
+        .trim();
       if (company == '매일경제' || company == '한국경제') {
         filteredList.push({
           title,
@@ -57,7 +59,32 @@ export class LandBlogService {
         });
       }
     });
-    console.log(filteredList);
+    await page.close();
+    const promises = filteredList.map(async (article) => {
+      const page = await browser.newPage();
+      await page.goto(article.url);
+      const content = await page.content();
+      const $ = cheerio.load(content);
+      let p = $('#dic_area').text().trim();
+      p = p
+        .split('+')
+        .filter((str) => str.length > 10)
+        .join(' ');
+      if (p.length > 500) {
+        article.desc =
+          p.substr(0, 250) + '...중략...' + p.substr(p.length - 250);
+      } else {
+        article.desc = p;
+      }
+
+      await page.close();
+    });
+
+    Promise.all(promises).then(async () => {
+      await browser.close();
+      console.log(filteredList);
+      console.log(filteredList.length);
+    });
 
     return 'success';
   }
