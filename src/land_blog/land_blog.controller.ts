@@ -5,6 +5,8 @@ import { LandBlogService } from './land_blog.service';
 export class LandBlogController {
   constructor(private readonly landBlogService: LandBlogService) {}
 
+  // crom setting으로 변경 예정
+  // getFormatDate
   @Get(':date')
   async getNewsList(@Param() params: any) {
     return await this.landBlogService.getData({ date: params.date });
